@@ -32,31 +32,16 @@ cmake_minimum_required (VERSION 2.6)
 
 
 #------------------- PARTIE PRINCIPALE -----------------------
-# Notre projet est étiqueté gurobiSolverCWLP
+# Notre projet est étiqueté TBPP
 set(name "TBPP")
 project (${name})
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-find_library(GUROBI_LIBRARY_CPLUS libgurobi_c++.a OR gurobi_c++mdd2019.lib PATHS /opt/local/stow/gurobi910/linux64/lib/ /Library/gurobi903/mac64/lib/ /Library/gurobi951/macos_universal2/lib C:/gurobi951/win64/lib/ /opt/gurobi951/linux64/lib/)
-find_library(GUROBI_LIBRARY libgurobi91.so OR libgurobi90.dylib OR libgurobi95.dylib OR libgurobi95.so OR gurobi95.lib PATHS /opt/local/stow/gurobi910/linux64/lib/ /Library/gurobi903/mac64/lib/ /Library/gurobi951/macos_universal2/lib/ C:/gurobi951/win64/lib/ /opt/gurobi951/linux64/lib/)
-set(GUROBI_LIBRARIES ${GUROBI_LIBRARY_CPLUS} ${GUROBI_LIBRARY})
-message(STATUS "GUROBI_LIBRARIES : ${GUROBI_LIBRARIES}")
-
-set(GUROBI_INCLUDE_DIR /opt/local/stow/gurobi910/linux64/include/ /Library/gurobi903/mac64/include/ /Library/gurobi951/macos_universal2/include/  C:/gurobi951/win64/include/ /opt/gurobi951/linux64/include/)
-
-
-
-# On indique où trouver les définitions des fonctions du solveur GUROBI
-include_directories(include ${GUROBI_INCLUDE_DIR})
-
 # On cherche tous les fichiers .cpp et .hpp dans le dossier src (stockage dans la variable SRCS)
 file(GLOB_RECURSE SRCS src/*.cpp include/*.hpp)
 message(STATUS "SRCS : ${SRCS}") #On affiche les fichiers trouvés
 
-# On indique que l'on veut un exécutable "gurobiSolverCWLP" compilé à partir des fichiers dans la variable SRCS
+# On indique que l'on veut un exécutable "TBPP" compilé à partir des fichiers dans la variable SRCS
 add_executable(${name} ${SRCS})
-
-# On indique où trouver les biblothèques du solveur GUROBI
-target_link_libraries(${name} ${GUROBI_LIBRARIES})
 
 
 

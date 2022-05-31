@@ -60,24 +60,71 @@ public:
         return group;
     }
 
-    vector<Vertice> getVertices(){
-        vector<Vertice> vertices;
+    bool isSuccessor(Vertice v, vector<Item> include, vector<Item> exclude){
+        for (Item it : include) {
+            if (!data.isItemIn(it, v.items)) {
+                return false;
+            }
+        }
+        for (Item it : exclude) {
+            if (data.isItemIn(it, v.items)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    vector<vector<Vertice>> getGraph(){
+        vector<vector<Vertice>> graph;
+        Vertice start;
         Vertice final;
-        vertices.push_back(final);
+        vector<Vertice> finalColumn;
+        finalColumn.push_back(final);
+        graph.push_back(finalColumn);
 
         vector<vector<Item>> bands = data.getMaxBands();
 
-        for (int a=bands.size()-1; a>=0; a++) {
+        for (int a=bands.size()-1; a>=0; a--) {
             vector<vector<Item>> combos = getFeasibleCombinations(bands[a]);
+            vector<Vertice> column;
             for (vector<Item> selection : combos) {
-                Vertice v;
-                v.items = selection;
+                Vertice u;
+                u.items = selection;
                 if (a==bands.size()-1) {
-                    v.successors.push_back(final);
+                    u.successors.push_back(final);
+                }else{
+                    vector<Item> exclude;
+                    vector<Item> include;
+                    for (Item it : selection) {
+                        if (data.isItemIn(it, bands[a+1])) {
+                            include.push_back(it);
+                        }
+                    }
+                    for (Item it : bands[a+1]) {
+                        if (data.isItemIn(it, bands[a]) && !data.isItemIn(it, selection)) {
+                            exclude.push_back(it);
+                        }
+                    }
+                    for (Vertice v : graph[graph.size()-1]) {
+                        if (isSuccessor(v, include, exclude)) {
+                            u.successors.push_back(v);
+                        }
+                    }
                 }
+                if (a==0) {
+                    start.successors.push_back(u);
+                }
+                column.push_back(u);
             }
-
+            graph.push_back(column);
         }
+        vector<Vertice> firstColumn;
+        firstColumn.push_back(start);
+        graph.push_back(firstColumn);
 
+        rotate(graph.begin(), graph.end()-1, graph.end());
+
+        return graph;
     }
+
 };
