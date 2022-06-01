@@ -7,38 +7,46 @@ using namespace std;
 
 class Item{
 public:
-    int id;
-    int size;
-    int entry;
-    int exit;
+    int _id;
+    int _size;
+    int _entry;
+    int _exit;
 
     bool equals(Item item){
-        return this->id==item.id;
+        return this->_id==item._id;
     }
 };
 
+
+/**
+ * TBP: Temporal Bin Packing
+ *
+ * minimize the number of bins needed to pack all items of the list
+ * Each item has a size and a date of entry and exit that determins when the the item is available to be packed
+ * The sum of the sizes in a bin is less than or equal to the bin's capacity at any moment in time.
+ */
 class TemporalBPData{
 public:
-    int capacity;
-    vector<Item> items;
+    int _capacity;           ///< capacity of a bin
+    vector<Item> _items;     ///< list of objects
 
-    static bool compareEntries(Item i, Item j) {
-	    return (i.entry < j.entry);
+    static bool compareEntries(Item i, Item j) {    ///< item entry date comparator used when sorting items
+	    return (i._entry < j._entry);
     }
 
-    TemporalBPData(){
-        capacity = 15;
-        items = {{1,6,6,20}, {2,4,10,26}, {3,8,12,16}, {4,7,17,23}, {5,4,24,30}, {6,7,28,32}};
-        sort(items.begin(), items.end(), compareEntries);
+    TemporalBPData(){       ///< parser not implemented yet
+        _capacity = 15;
+        _items = {{1,6,6,20}, {2,4,10,26}, {3,8,12,16}, {4,7,17,23}, {5,4,24,30}, {6,7,28,32}};
+        sort(_items.begin(), _items.end(), compareEntries);
     }
 
-    int getNbItems() const {
-        return items.size();
-    }
-    int getCapacity() const {
-        return capacity;
-    }
+    int getNbItems() const { return _items.size(); }
+    int getCapacity() const { return _capacity; }
+    int getUpperBound()   const { return _items.size(); }
 
+    /**
+     * Determines whether an item is present in a list
+     */
     bool isItemIn(Item item, vector<Item> items){
         for (Item it : items) {
             if (item.equals(it)) {
@@ -48,67 +56,29 @@ public:
         return false;
     }
 
-void display_items(vector<Item> items){
-    cout << "(";
-    for (int i=0; i<items.size(); i++) {
-        cout << items[i].id;
-        if (i<items.size()-1) {
-            cout << ",";
-        }
-    }
-    cout << ")";
-}
-    vector<vector<Item>> getMaxBands(){
-        // Needs some corrections!!!, III(2,5) is not considered because
-        vector<vector<Item>> bands;
-        vector<Item> ongoing;
-        for (int i=0; i<items.size(); i++) {
-            Item curItem = items[i];
-            //cout << "cuI " << curItem.id  << ", entry= " << curItem.entry << endl;
-            for (int j=ongoing.size()-1; j>=0; j--) {
+    /**
+     * Computes the maximum cliques within our list of items
+     */
+    vector<vector<Item>> getMaxCliques(){
+        vector<vector<Item>> cliques;   ///< list of maximum cliques
+        vector<Item> ongoing;           ///< list of items who have yet to exit
+        for (int i=0; i<_items.size(); i++) {   ///< we iterate over items sorted by increasing entry date
+            Item curItem = _items[i];   
+            for (int j=ongoing.size()-1; j>=0; j--) {   ///<we iterate over ongoing items
                 Item pastItem = ongoing[j];
-            //cout << "  paI " << pastItem.id  << ", exit= " << pastItem.exit << endl;
-                if (pastItem.exit <= items[i].entry) {
-                    if ( bands.size()==0 || !isItemIn(ongoing[ongoing.size()-1], bands[bands.size()-1])){
-                    //Correction: if there is even 1 new element in ongoing whenever any one element
-                    // is leaving oongoing, we have a new band. DONE!
-                        vector<Item> band = ongoing;
-/*
-                        cout << "band: ";
-                        display_items(band);
-                        cout << endl;
-*/
-                        bands.push_back(band);
+                if (pastItem._exit <= _items[i]._entry) {   ///< if it is time for an ongoing item to leave
+                    if ( cliques.size()==0 || !isItemIn(ongoing[ongoing.size()-1], cliques[cliques.size()-1])){
+                        ///< if the last item added in the ongoing list does not belong in our latest clique
+                        vector<Item> clique = ongoing;      ///< then we have a new clique with at least the last item of ongoing
+                        cliques.push_back(clique);         //< as a new item in a clique.
                     }
                     ongoing.erase(ongoing.begin()+j);
                 }
             }
             ongoing.push_back(curItem);
         }
-        /*cout << "band: ";
-        display_items(ongoing);
-        cout << endl;*/
-        bands.push_back(ongoing);
-        return bands;
+        cliques.push_back(ongoing);     ///< the final items present since the last entry also form a clique
+        return cliques;
     }
-/*
-    vector<vector<Item>> getAllCombinations(vector<Item> list){
-        vector<vector<Item>> group;
-        if (list.empty()) {
-            vector<Item> empty;
-            group.push_back(empty);
-        }else{
-            Item item = list[list.size()-1];
-            list.pop_back();
 
-            for (vector<Item> combo : getAllCombinations(list)) {
-                group.push_back(combo);
-                combo.push_back(item);
-                group.push_back(combo);
-            }
-        }
-
-        return group;
-    }
-*/
 };
