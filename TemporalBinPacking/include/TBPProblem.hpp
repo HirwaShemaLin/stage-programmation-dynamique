@@ -2,8 +2,6 @@
 // Created by lhirwashema on 2022-06-01.
 //
 
-#pragma once
-
 #include "TBPdata.hpp"
 #include <algorithm>
 #include <iostream>

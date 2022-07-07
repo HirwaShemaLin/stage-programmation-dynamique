@@ -1,3 +1,7 @@
 {
-    "cmake.sourceDirectory": "${workspaceFolder}/TemporalBinPacking"
+    "cmake.sourceDirectory": "${workspaceFolder}/TemporalBinPacking",
+    "files.associations": {
+        "algorithm": "cpp",
+        "iostream": "cpp"
+    }
 }

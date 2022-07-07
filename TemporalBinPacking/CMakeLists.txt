@@ -38,10 +38,12 @@ project (${name})
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 # On cherche tous les fichiers .cpp et .hpp dans le dossier src (stockage dans la variable SRCS)
 file(GLOB_RECURSE SRCS src/*.cpp include/*.hpp)
+file(GLOB_RECURSE INCS include/*.hpp)
 message(STATUS "SRCS : ${SRCS}") #On affiche les fichiers trouvés
 
 # On indique que l'on veut un exécutable "TBPP" compilé à partir des fichiers dans la variable SRCS
-add_executable(${name} ${SRCS})
+add_executable(TBP ${SRCS})
+target_link_libraries(TBP ${INCS})
 
 
 

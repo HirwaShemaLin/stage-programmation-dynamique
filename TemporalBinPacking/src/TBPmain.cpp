@@ -1,12 +1,12 @@
-#include "../include/TBPProblem.hpp"
+#include "../include/TBPdata.hpp"
 #include <string>
 #include <vector>
 #include <iomanip>
 
-string list_items(vector<Item> items){
+string list_items(vector<int> items){
     string sItems = "(";
     for (int i=0; i<items.size(); i++) {
-        sItems += to_string(items[i]._id);
+        sItems += to_string(items[i]);
         if (i<items.size()-1) {
             sItems += ",";
         }
@@ -19,7 +19,7 @@ string list_arcs(vector<Arc> arcs){
     string sItems = "{";
     for (int i=0; i<arcs.size(); i++) {
         sItems += to_string(arcs[i]._successorId);
-        if (arcs[i]._cost==0)
+        if (arcs[i]._newItems.empty())
         {
             sItems += "-";
         }else
@@ -65,7 +65,26 @@ void display_graph(TBPProblem * problem){
 */
 
 int main(int argc, char * argv[]){
+    //TemporalBPData data = TemporalBPData();
+    string fileName = "../data/I_1.txt";
+    cout << "<testCSP> Reading the file " << endl;
+    ifstream dataFile(fileName);
+
     TemporalBPData data;
+    string methodName = "Normal";
+
+    cout << "<testTBP> Creating " << methodName << " Graph" << endl;
+
+    if (methodName == "reduced")
+    {
+        data = TemporalBPData(dataFile, true);
+    }
+    else
+    {
+        data = TemporalBPData(dataFile, false);
+    }
+    
+    dataFile.close(); 
 
     for(int c=0 ; c<data.getNbColumns() ; ++c){
         for (int v = 0; v < data._graph[c].size(); v++)
@@ -73,6 +92,18 @@ int main(int argc, char * argv[]){
             Vertex * u = & data._graph[c][v];
             cout << "Vertex " << u->_id << " : \tItems = " << list_items(u->_items) << ",\t Arcs = " << list_arcs(u->_arcs) << endl;
         }
+        cout << endl;
     }
+
+    for (auto &&clique : data.getReducedCliques())
+    {
+        cout << "(";
+        for (auto &&i : clique)
+        {
+            cout << i << ", ";
+        }
+        cout << ")," << endl;
+    }
+    
 
 }
